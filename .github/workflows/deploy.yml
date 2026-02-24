@@ -2,7 +2,7 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build-and-push:
@@ -26,3 +26,15 @@ jobs:
 
       - name: Push frontend image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/dd-frontend:latest
+      
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd crud-dd-task-mean-app
+            docker compose pull
+            docker compose down
+            docker compose up -d
