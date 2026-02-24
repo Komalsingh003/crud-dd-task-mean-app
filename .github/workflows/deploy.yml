@@ -8,6 +8,9 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
+    env:
+      EC2_HOST: ${{ secrets.EC2_HOST }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -27,9 +30,9 @@ jobs:
       - name: Push frontend image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/dd-frontend:latest
 
-      # Deployment only runs IF EC2 secrets exist
+      # This step runs ONLY if EC2_HOST exists
       - name: Deploy to EC2
-        if: ${{ secrets.EC2_HOST != '' }}
+        if: env.EC2_HOST != ''
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
